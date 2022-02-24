@@ -6,15 +6,22 @@ use PHPUnit\Framework\TestCase;
 
 class ZttpTest extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         ZttpServer::start();
     }
 
     function url($url)
     {
+        if (getenv('TEST_SERVER_PORT') == '80') {
+            return vsprintf('%s/%s', [
+                'http://' . getenv('TEST_SERVER_HOST', 'localhost'),
+                ltrim($url, '/'),
+            ]);
+        }
+
         return vsprintf('%s/%s', [
-            'http://localhost:' . getenv('TEST_SERVER_PORT'),
+            'http://' . getenv('TEST_SERVER_HOST', 'localhost') . ':' . getenv('TEST_SERVER_PORT'),
             ltrim($url, '/'),
         ]);
     }
@@ -140,7 +147,6 @@ class ZttpTest extends TestCase
         $this->assertTrue($response['has_file']);
         $this->assertEquals($response['file_content'], 'test contents');
         $this->assertStringStartsWith('multipart', $response['headers']['content-type'][0]);
-
     }
 
     /** @test */
@@ -474,9 +480,9 @@ class ZttpTest extends TestCase
     /** @test */
     function can_use_basic_auth()
     {
-       $response = Zttp::withBasicAuth('zttp', 'secret')->get($this->url('/basic-auth'));
+        $response = Zttp::withBasicAuth('zttp', 'secret')->get($this->url('/basic-auth'));
 
-       $this->assertTrue($response->isOk());
+        $this->assertTrue($response->isOk());
     }
 
     /** @test */
@@ -524,9 +530,9 @@ class ZttpServer
 {
     static function start()
     {
-        $pid = exec('php -S ' . 'localhost:' . getenv('TEST_SERVER_PORT') . ' -t ./tests/server/public > /dev/null 2>&1 & echo $!');
+        $pid = exec('php -S ' . '' . getenv('TEST_SERVER_HOST', 'localhost') . ':' . getenv('TEST_SERVER_PORT') . ' -t ./tests/server/public > /dev/null 2>&1 & echo $!');
 
-        while (@file_get_contents('http://localhost:' . getenv('TEST_SERVER_PORT') . '/get') === false) {
+        while (@file_get_contents('http://' . getenv('TEST_SERVER_HOST', 'localhost') . ':' . getenv('TEST_SERVER_PORT') . '/get') === false) {
             usleep(1000);
         }
 
