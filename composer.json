@@ -1,11 +1,14 @@
 {
-    "name": "kitetail/zttp",
-    "description": "A developer-experience focused HTTP client, optimized for most common use cases.",
+    "name": "perfect-space/zttp",
+    "description": "A developer-experience focused HTTP client, optimized for most common use cases (forked by Nate Ritter).",
     "keywords": ["http", "guzzle"],
     "license": "MIT",
     "authors": [{
         "name": "Adam Wathan",
         "email": "adam.wathan@gmail.com"
+    }, {
+        "name": "Nate Ritter",
+        "email": "nate@perfectspace.com"
     }],
     "require": {
         "php": ">=7.0",
